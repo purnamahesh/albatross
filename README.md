@@ -71,7 +71,7 @@ This project is a feature-rich RSS/Atom feed aggregator that provides a REST API
 1. **Project Setup**
    ```toml
    [workspace]
-   members = ["server", "models", "feed-fetcher"]
+   members = ["models", "feed-fetcher"]
    ```
 
 2. **Basic REST API** (axum)
@@ -356,8 +356,8 @@ This project is a feature-rich RSS/Atom feed aggregator that provides a REST API
 ## Project Structure
 
 ```
-rss-aggregator/
-├── Cargo.toml              # Workspace configuration
+albatross/                  # Root is the main server package
+├── Cargo.toml              # Workspace + albatross server package config
 ├── Cargo.lock              # Dependency lock file
 ├── README.md               # Project documentation
 │
@@ -372,63 +372,62 @@ rss-aggregator/
 │
 ├── prometheus.yml          # Prometheus configuration (optional)
 │
-├── server/                 # Main API server
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── main.rs
-│   │   ├── routes/        # Axum route handlers
-│   │   │   ├── mod.rs
-│   │   │   ├── feeds.rs
-│   │   │   ├── articles.rs
-│   │   │   └── auth.rs
-│   │   ├── middleware/    # Custom middleware
-│   │   │   ├── mod.rs
-│   │   │   ├── auth.rs
-│   │   │   └── rate_limit.rs
-│   │   ├── handlers/      # Request handlers
-│   │   │   ├── mod.rs
-│   │   │   ├── feed_handler.rs
-│   │   │   └── article_handler.rs
-│   │   ├── config.rs      # Configuration
-│   │   └── error.rs       # Error types
-│   └── tests/
-│       ├── integration_test.rs
-│       └── common/
+├── src/                    # Main API server (albatross binary)
+│   ├── main.rs
+│   ├── routes/             # Axum route handlers
+│   │   ├── mod.rs
+│   │   ├── feeds.rs
+│   │   ├── articles.rs
+│   │   └── auth.rs
+│   ├── middleware/         # Custom middleware
+│   │   ├── mod.rs
+│   │   ├── auth.rs
+│   │   └── rate_limit.rs
+│   ├── handlers/           # Request handlers
+│   │   ├── mod.rs
+│   │   ├── feed_handler.rs
+│   │   └── article_handler.rs
+│   ├── config.rs           # Configuration
+│   └── error.rs            # Error types
 │
-├── models/                 # Shared data models
+├── tests/                  # Integration tests for server
+│   ├── integration_test.rs
+│   └── common/
+│
+├── models/                 # Shared data models (library)
 │   ├── Cargo.toml
 │   └── src/
 │       ├── lib.rs
-│       ├── feed.rs        # Feed data model
-│       ├── article.rs     # Article data model
-│       ├── user.rs        # User data model (Phase 3)
-│       └── error.rs       # Shared error types
+│       ├── feed.rs         # Feed data model
+│       ├── article.rs      # Article data model
+│       ├── user.rs         # User data model (Phase 3)
+│       └── error.rs        # Shared error types
 │
-├── feed-fetcher/          # Feed fetching & parsing
+├── feed-fetcher/           # Feed fetching & parsing (library)
 │   ├── Cargo.toml
 │   └── src/
 │       ├── lib.rs
-│       ├── fetcher.rs     # HTTP fetching with reqwest
-│       ├── parser.rs      # RSS/Atom XML parsing
-│       ├── worker.rs      # Background worker (tokio)
-│       └── cache.rs       # Feed caching (Phase 3)
+│       ├── fetcher.rs      # HTTP fetching with reqwest
+│       ├── parser.rs       # RSS/Atom XML parsing
+│       ├── worker.rs       # Background worker (tokio)
+│       └── cache.rs        # Feed caching (Phase 3)
 │
-├── database/              # Database layer
+├── database/               # Database layer (library, optional Phase 2+)
 │   ├── Cargo.toml
-│   ├── migrations/        # SQLx SQL migrations
+│   ├── migrations/         # SQLx SQL migrations
 │   │   ├── 001_create_feeds.sql
 │   │   ├── 002_create_articles.sql
 │   │   └── 003_create_users.sql
 │   └── src/
 │       ├── lib.rs
-│       ├── pool.rs        # Connection pool
-│       └── repositories/  # Repository pattern
+│       ├── pool.rs         # Connection pool
+│       └── repositories/   # Repository pattern
 │           ├── mod.rs
 │           ├── feed_repo.rs
 │           ├── article_repo.rs
 │           └── user_repo.rs
 │
-└── integration-tests/      # End-to-end tests
+└── integration-tests/      # End-to-end tests (optional)
     ├── Cargo.toml
     └── tests/
         ├── api_tests.rs
@@ -523,21 +522,30 @@ curl http://localhost:3000/health
 ### Phase 1 Quick Start (Local Development)
 
 ```bash
-# 1. Create new workspace
-mkdir rss-aggregator && cd rss-aggregator
+# 1. Create new project (root will be the server)
+cargo new albatross
+cd albatross
 
-# 2. Initialize workspace
+# 2. Update Cargo.toml to be a workspace
 cat > Cargo.toml << EOF
 [workspace]
-members = ["server", "models", "feed-fetcher", "database"]
+members = ["models", "feed-fetcher"]
 resolver = "2"
+
+[package]
+name = "albatross"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+axum = "0.7"
+serde = { version = "1.0", features = ["derive"] }
 EOF
 
-# 3. Create projects
+# 3. Create library workspace members
 cargo new --lib models
-cargo new server
 cargo new --lib feed-fetcher
-cargo new --lib database
 
 # 4. Start PostgreSQL and Redis (if not using Docker)
 # macOS:
@@ -560,8 +568,7 @@ PORT=3000
 RUST_LOG=info
 EOF
 
-# 7. Run server
-cd server
+# 7. Run server (from root directory)
 cargo run
 ```
 
@@ -587,8 +594,8 @@ cargo watch -x run
 # Or run tests on change
 cargo watch -x test
 
-# Run specific workspace member
-cargo watch -x "run -p server"
+# Run the main binary (albatross)
+cargo watch -x "run -p albatross"
 ```
 
 ### Environment Variables
@@ -766,33 +773,28 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy manifests
+# Copy manifests (root is the albatross package)
 COPY Cargo.toml Cargo.lock ./
-COPY server/Cargo.toml ./server/
 COPY models/Cargo.toml ./models/
 COPY feed-fetcher/Cargo.toml ./feed-fetcher/
-COPY database/Cargo.toml ./database/
 
 # Create dummy source files to build dependencies (caching optimization)
-RUN mkdir -p server/src models/src feed-fetcher/src database/src && \
-    echo "fn main() {}" > server/src/main.rs && \
+RUN mkdir -p src models/src feed-fetcher/src && \
+    echo "fn main() {}" > src/main.rs && \
     echo "pub fn dummy() {}" > models/src/lib.rs && \
-    echo "pub fn dummy() {}" > feed-fetcher/src/lib.rs && \
-    echo "pub fn dummy() {}" > database/src/lib.rs
+    echo "pub fn dummy() {}" > feed-fetcher/src/lib.rs
 
 # Build dependencies (this layer is cached)
 RUN cargo build --release --workspace && \
-    rm -rf server/src models/src feed-fetcher/src database/src
+    rm -rf src models/src feed-fetcher/src
 
 # Copy actual source code
-COPY server/src ./server/src
+COPY src ./src
 COPY models/src ./models/src
 COPY feed-fetcher/src ./feed-fetcher/src
-COPY database/src ./database/src
-COPY database/migrations ./database/migrations
 
 # Build the actual application
-RUN cargo build --release --bin server
+RUN cargo build --release --bin albatross
 
 # Stage 2: Runtime
 FROM debian:bookworm-slim
@@ -810,8 +812,7 @@ RUN useradd -m -u 1000 appuser
 WORKDIR /app
 
 # Copy binary from builder
-COPY --from=builder /app/target/release/server /usr/local/bin/server
-COPY --from=builder /app/database/migrations /app/migrations
+COPY --from=builder /app/target/release/albatross /usr/local/bin/albatross
 
 # Change ownership
 RUN chown -R appuser:appuser /app
@@ -825,7 +826,7 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["server"]
+CMD ["albatross"]
 ```
 
 #### .dockerignore

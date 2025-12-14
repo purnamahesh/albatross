@@ -3,4 +3,9 @@ name = "albatross"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = ["models", "feed-fetcher"]
+
 [dependencies]
+models = { path = "models"}
+feed-fetcher = { path = "feed-fetcher"}

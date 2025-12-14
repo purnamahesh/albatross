@@ -5,3 +5,15 @@ version = 4
 [[package]]
 name = "albatross"
 version = "0.1.0"
+dependencies = [
+ "feed-fetcher",
+ "models",
+]
+
+[[package]]
+name = "feed-fetcher"
+version = "0.1.0"
+
+[[package]]
+name = "models"
+version = "0.1.0"
