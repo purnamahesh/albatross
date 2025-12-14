@@ -6,9 +6,14 @@ version = 4
 name = "albatross"
 version = "0.1.0"
 dependencies = [
+ "database",
  "feed-fetcher",
  "models",
 ]
+
+[[package]]
+name = "database"
+version = "0.1.0"
 
 [[package]]
 name = "feed-fetcher"

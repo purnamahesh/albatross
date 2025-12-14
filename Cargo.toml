@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["models", "feed-fetcher"]
+members = ["models", "feed-fetcher", "database"]
 
 [dependencies]
 models = { path = "models"}
 feed-fetcher = { path = "feed-fetcher"}
+database ={ path = "database"}
