@@ -1,3 +1,8 @@
-fn main() {
-    println!("Hello, world!");
+use albatross::app;
+use std::error::Error;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    app().await?;
+    Ok(())
 }
