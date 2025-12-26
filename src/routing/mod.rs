@@ -6,6 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
 };
+use feed_fetcher::article_handlers::list_articles;
 use feed_fetcher::feed_handlers::{list_subscribed_feed, subscribe_feed, unsubscribe_feed};
 use models::models::{AppState, Feed};
 use std::sync::RwLock;
@@ -25,5 +26,6 @@ pub fn create_router() -> Router {
         .route("/feeds", post(subscribe_feed))
         .route("/feeds", get(list_subscribed_feed))
         .route("/feeds/{id}", post(unsubscribe_feed))
+        .route("/articles", get(list_articles))
         .with_state(state.clone())
 }
