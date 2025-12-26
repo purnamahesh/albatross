@@ -1,4 +1,4 @@
-use std::{ascii::AsciiExt, sync::Arc};
+use std::sync::Arc;
 use uuid::Uuid;
 
 use axum::{

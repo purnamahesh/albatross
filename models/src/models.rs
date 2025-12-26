@@ -15,7 +15,7 @@ pub struct Feed {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Article {
     pub id: Uuid,
-    pub feed_id: Uuid,
+    pub feed_id: Option<Uuid>, // TODO: Remove Option<_>
     pub title: String,
     pub link: String,
     pub published: DateTime<Utc>,
@@ -25,4 +25,12 @@ pub struct Article {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppState {
     pub subscribed_feeds: RwLock<Vec<Feed>>,
+}
+
+#[derive(Deserialize)]
+struct ArticleQuery {
+    feed_id: Option<Uuid>,
+    unread_only: Option<bool>,
+    limit: Option<i64>,
+    offset: Option<i64>,
 }
