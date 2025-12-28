@@ -1,6 +1,6 @@
 // fetch articles
 
-use models::models::Feed;
+use models::rest::Feed;
 use rss::Channel;
 use std::error::Error;
 

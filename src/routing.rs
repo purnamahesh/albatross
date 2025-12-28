@@ -1,25 +1,20 @@
-use std::sync::Arc;
 
 use axum::{
-    Router,
+    Extension, Router,
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, post},
 };
+use database::pool::create_conn_pool;
 use feed_fetcher::article_handlers::list_articles;
 use feed_fetcher::feed_handlers::{list_subscribed_feed, subscribe_feed, unsubscribe_feed};
-use models::models::{AppState, Feed};
-use std::sync::RwLock;
 
 async fn health_check() -> Response {
     (StatusCode::OK, "up and running").into_response()
 }
 
-pub fn create_router() -> Router {
-    // let x = Vec::<Feed>::new();
-    let state = Arc::new(AppState {
-        subscribed_feeds: RwLock::new(Vec::<Feed>::new()),
-    });
+pub async fn create_router() -> Router {
+    let pool_conn = create_conn_pool().await;
 
     Router::new()
         .route("/health", get(health_check))
@@ -27,5 +22,5 @@ pub fn create_router() -> Router {
         .route("/feeds", get(list_subscribed_feed))
         .route("/feeds/{id}", post(unsubscribe_feed))
         .route("/articles", get(list_articles))
-        .with_state(state.clone())
+        .layer(Extension(pool_conn))
 }

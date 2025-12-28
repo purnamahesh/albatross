@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 sqlx = { version = "0.8.6", features = ["macros", "derive", "postgres", "runtime-tokio"] }
+
+# [dev-dependencies]
+dotenvy = "0.15.7"

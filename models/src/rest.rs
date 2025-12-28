@@ -1,12 +1,9 @@
-use std::sync::RwLock;
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Feed {
-    pub id: Option<Uuid>, // TODO: Remove Option<_>
     pub url: String,
     pub title: String,
     pub description: Option<String>,
@@ -20,11 +17,6 @@ pub struct Article {
     pub link: String,
     pub published: DateTime<Utc>,
     pub content: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AppState {
-    pub subscribed_feeds: RwLock<Vec<Feed>>,
 }
 
 #[derive(Deserialize)]

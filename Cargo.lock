@@ -18,6 +18,7 @@ dependencies = [
  "assert_cmd",
  "axum",
  "database",
+ "dotenvy",
  "feed-fetcher",
  "models",
  "rstest",
@@ -366,6 +367,7 @@ dependencies = [
 name = "database"
 version = "0.1.0"
 dependencies = [
+ "dotenvy",
  "sqlx",
 ]
 
@@ -526,6 +528,7 @@ dependencies = [
  "models",
  "reqwest",
  "rss",
+ "sqlx",
  "uuid",
 ]
 
@@ -1209,6 +1212,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "serde",
+ "sqlx",
  "uuid",
 ]
 
@@ -2004,6 +2008,7 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -2083,6 +2088,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2120,6 +2126,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2145,6 +2152,7 @@ dependencies = [
  "thiserror",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]

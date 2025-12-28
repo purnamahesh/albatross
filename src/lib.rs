@@ -6,7 +6,7 @@ use crate::routing::create_router;
 mod routing;
 
 pub async fn app() -> Result<(), Box<dyn Error>> {
-    let router = create_router();
+    let router = create_router().await;
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8055").await?;
     axum::serve(listener, router).await?;
     Ok(())
