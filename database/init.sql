@@ -16,5 +16,6 @@ create table if not exists article (
     read bool DEFAULT false,
     published timestamptz NOT NULL,
     PRIMARY KEY(id),
-    FOREIGN KEY (feed_id) REFERENCES feed(id)
+    FOREIGN KEY (feed_id) REFERENCES feed(id),
+    UNIQUE(url)
 )

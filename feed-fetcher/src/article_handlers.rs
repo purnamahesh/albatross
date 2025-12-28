@@ -1,37 +1,19 @@
-use std::sync::Arc;
-
 use axum::{
-    Json,
-    extract::State,
+    Extension, Json,
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use models::rest::Article;
-
-use crate::{fetcher::feed_fetcher, parser::feed_parser};
+use models::db::Article;
+use sqlx::{Pool, Postgres};
 
 #[axum::debug_handler]
-pub async fn list_articles() -> Response {
-    // let feeds = app_state.subscribed_feeds.read().unwrap().clone();
-    // let mut articles: Vec<Article> = vec![];
-    // for feed in feeds.iter() {
-    //     match feed_fetcher(feed).await {
-    //         Ok(ch) => match feed_parser(feed, ch.clone()).await {
-    //             Ok(mut channels_articles) => {
-    //                 articles.append(&mut channels_articles);
-    //             }
-    //             Err(err) => {
-    //                 eprintln!("error at feed_parser:{:?}", err);
-    //                 return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response();
-    //             }
-    //         },
-    //         Err(err) => {
-    //             eprintln!("error at feed_fetcher:{:?}", err);
-    //             return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response();
-    //         }
-    //     };
-    // }
+pub async fn list_articles(Extension(conn): Extension<Pool<Postgres>>) -> Response {
+    let result = sqlx::query_as::<_, Article>("SELECT * FROM article;")
+        .fetch_all(&conn)
+        .await;
 
-    // (StatusCode::OK, Json(articles)).into_response()
-    todo!()
+    match result {
+        Ok(articles) => return (StatusCode::CREATED, Json(articles)).into_response(),
+        Err(err) => return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
+    };
 }

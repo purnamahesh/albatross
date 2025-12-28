@@ -11,10 +11,9 @@ pub struct Feed {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Article {
-    pub id: Uuid,
-    pub feed_id: Option<Uuid>, // TODO: Remove Option<_>
+    pub feed_id: Uuid,
     pub title: String,
-    pub link: String,
+    pub url: String,
     pub published: DateTime<Utc>,
     pub content: String,
 }
