@@ -27,12 +27,12 @@ pub async fn bg_article_fetcher(conn: Pool<Postgres>) {
                                     .bind(&article.url)
                                     .bind(&article.title)
                                     .bind(&article.content)
-                                    .bind(&article.published)
+                                    .bind(article.published)
                                     .execute(&conn)
                                     .await;
 
                                     match result {
-                                        Ok(affected_rows) => {
+                                        Ok(_affected_rows) => {
                                             // if affected_rows.rows_affected() > 0 {
                                             //     println!("Insert successful!");
                                             // } else {

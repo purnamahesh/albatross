@@ -6,10 +6,7 @@ use axum::{
 };
 use database::pool::create_conn_pool;
 use feed_fetcher::feed_handlers::{list_subscribed_feed, subscribe_feed, unsubscribe_feed};
-use feed_fetcher::{
-    article_handlers::list_articles,
-    worker::{self, bg_article_fetcher},
-};
+use feed_fetcher::{article_handlers::list_articles, worker::bg_article_fetcher};
 
 async fn health_check() -> Response {
     (StatusCode::OK, "up and running").into_response()

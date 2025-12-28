@@ -13,7 +13,7 @@ pub async fn list_articles(Extension(conn): Extension<Pool<Postgres>>) -> Respon
         .await;
 
     match result {
-        Ok(articles) => return (StatusCode::CREATED, Json(articles)).into_response(),
-        Err(err) => return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
-    };
+        Ok(articles) => (StatusCode::CREATED, Json(articles)).into_response(),
+        Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
+    }
 }

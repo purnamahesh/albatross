@@ -10,13 +10,11 @@ pub async fn create_conn_pool() -> Pool<Postgres> {
             exit(1)
         }
     };
-    let conn_pool = match PgPool::connect(&conn_url).await {
-        Ok(x) => x,
+    match PgPool::connect(&conn_url).await {
+        Ok(conn_pool) => conn_pool,
         Err(err) => {
             eprintln!("{}", err);
             exit(1)
         }
-    };
-
-    conn_pool
+    }
 }

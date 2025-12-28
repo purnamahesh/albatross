@@ -39,9 +39,9 @@ pub async fn list_subscribed_feed(Extension(conn): Extension<Pool<Postgres>>) ->
         .await;
 
     match result {
-        Ok(subed_feeds) => return (StatusCode::CREATED, Json(subed_feeds)).into_response(),
-        Err(err) => return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
-    };
+        Ok(subed_feeds) => (StatusCode::CREATED, Json(subed_feeds)).into_response(),
+        Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
+    }
 }
 
 pub async fn unsubscribe_feed(
@@ -55,14 +55,12 @@ pub async fn unsubscribe_feed(
 
     match result {
         Ok(affected_rows) => {
-            return {
-                if affected_rows.rows_affected() > 0 {
-                    (StatusCode::OK, format!("Unsubscribed from feed {}", id)).into_response()
-                } else {
-                    (StatusCode::NOT_FOUND, format!("feed {} not found", id)).into_response()
-                }
-            };
+            if affected_rows.rows_affected() > 0 {
+                (StatusCode::OK, format!("Unsubscribed from feed {}", id)).into_response()
+            } else {
+                (StatusCode::NOT_FOUND, format!("feed {} not found", id)).into_response()
+            }
         }
-        Err(err) => return (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
-    };
+        Err(err) => (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()).into_response(),
+    }
 }

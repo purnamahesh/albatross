@@ -5,7 +5,6 @@ use std::{cell::Cell, error::Error};
 use chrono::{NaiveDateTime, Utc};
 use models::{db::Feed, rest::Article};
 use rss::Channel;
-use uuid::Uuid;
 
 pub async fn feed_parser(
     feed: &Feed,

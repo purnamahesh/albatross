@@ -18,10 +18,10 @@ pub struct Article {
     pub content: String,
 }
 
-#[derive(Deserialize)]
-struct ArticleQuery {
-    feed_id: Option<Uuid>,
-    unread_only: Option<bool>,
-    limit: Option<i64>,
-    offset: Option<i64>,
-}
+// #[derive(Deserialize)]
+// struct ArticleQuery {
+//     feed_id: Option<Uuid>,
+//     unread_only: Option<bool>,
+//     limit: Option<i64>,
+//     offset: Option<i64>,
+// }
