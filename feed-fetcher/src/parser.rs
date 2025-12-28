@@ -16,7 +16,7 @@ pub async fn feed_parser(
     let default_pub_date_str = Cell::new(default_pub_date.format("%Y-%m-%dT%H:%M:%SZ").to_string());
 
     for article in channel.items() {
-        println!("{:?}\n\n", article); // TODO remove
+        // println!("{:?}\n\n", article); // TODO remove
         let pub_date = match NaiveDateTime::parse_from_str(
             &article
                 .pub_date
