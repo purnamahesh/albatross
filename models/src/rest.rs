@@ -1,15 +1,15 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Feed {
     pub url: String,
     pub title: String,
     pub description: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Article {
     pub feed_id: Uuid,
     pub title: String,
@@ -18,10 +18,10 @@ pub struct Article {
     pub content: String,
 }
 
-// #[derive(Deserialize)]
-// struct ArticleQuery {
-//     feed_id: Option<Uuid>,
-//     unread_only: Option<bool>,
-//     limit: Option<i64>,
-//     offset: Option<i64>,
-// }
+#[derive(Debug, Deserialize)]
+pub struct ArticleQuery {
+    pub feed_id: Option<Uuid>,
+    pub unread_only: Option<bool>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
