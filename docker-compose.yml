@@ -1,0 +1,21 @@
+# version: "3.9"
+services:
+  database:
+    image: postgres:latest
+    volumes:
+      - albatross-db:/var/lib/postgresql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=albatross
+      - POSTGRES_PASSWORD=albatross
+      - POSTGRES_DB=albatross
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: psql -U albatross -q -d albatross -c "SELECT 'ready';"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+volumes:
+  albatross-db:

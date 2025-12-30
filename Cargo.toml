@@ -2,6 +2,31 @@
 name = "albatross"
 version = "0.1.0"
 edition = "2024"
+description = """
+A production-grade RSS feed aggregator and reader API built with Rust, designed to teach modern async Rust practices through progressive complexity.
+"""
+readme = "README.md"
+documentation = "https://purnamahesh.github.io/albatross/"
+homepage = "https://github.com/purnamahesh/albatross/"
+repository = "https://github.com/purnamahesh/albatross/"
+keywords = ["rss", "atom", "feeds"]
+categories = [""]
+license-file = "LICENSE"
+exclude = [
+  "/.github/",
+  "/hooks/",
+  "/.gitignore",
+  "/docs/",
+  "*.sh",
+  "test.sh",
+  "VCS-README.md",
+  "HOOKS-README.md",
+  "ROADMAP.md",
+  "docs-template.md",
+  "tests/resources/"
+]
+autotests = false
+rust-version = "1.91.0"
 
 [workspace]
 members = ["models", "feed-fetcher", "database"]
@@ -12,3 +37,12 @@ feed-fetcher = { path = "feed-fetcher"}
 database ={ path = "database"}
 axum = "0.8.7"
 tokio = { version = "1.48.0", features = ["rt-multi-thread", "macros"] }
+dotenvy = "0.15.7"
+
+[dev-dependencies]
+rstest = "0.26.1"
+assert_cmd = "2.1.1"
+
+# [[test]]
+# name = "integration_test"
+# path = "tests/integration_test.rs"
