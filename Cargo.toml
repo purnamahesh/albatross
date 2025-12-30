@@ -3,13 +3,13 @@ name = "albatross"
 version = "0.1.0"
 edition = "2024"
 description = """
-expense-tracker is a cli based tool to track expenses.
+A production-grade RSS feed aggregator and reader API built with Rust, designed to teach modern async Rust practices through progressive complexity.
 """
 readme = "README.md"
 documentation = "https://purnamahesh.github.io/albatross/"
 homepage = "https://github.com/purnamahesh/albatross/"
 repository = "https://github.com/purnamahesh/albatross/"
-keywords = ["rss", "feeds"]
+keywords = ["rss", "atom", "feeds"]
 categories = [""]
 license-file = "LICENSE"
 exclude = [
