@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -24,4 +24,28 @@ pub struct ArticleQuery {
     pub unread_only: Option<bool>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UserLogin {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct LoginResponse {
+    pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UserRegister {
+    pub username: String,
+    pub password: String,
+    pub confirm_password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UserRegisterResponse {
+    pub username: String,
+    pub user_id: Uuid,
 }

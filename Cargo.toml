@@ -29,12 +29,13 @@ autotests = false
 rust-version = "1.91.0"
 
 [workspace]
-members = ["models", "feed-fetcher", "database"]
+members = ["models", "feed-fetcher", "database", "auth"]
 
 [dependencies]
 models = { path = "models"}
 feed-fetcher = { path = "feed-fetcher"}
-database ={ path = "database"}
+database = { path = "database"}
+auth = { path = "auth"}
 axum = "0.8.7"
 tokio = { version = "1.48.0", features = ["rt-multi-thread", "macros"] }
 dotenvy = "0.15.7"

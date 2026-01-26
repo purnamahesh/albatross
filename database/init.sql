@@ -18,4 +18,11 @@ create table if not exists article (
     PRIMARY KEY(id),
     FOREIGN KEY (feed_id) REFERENCES feed(id),
     UNIQUE(url)
-)
+);
+
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
