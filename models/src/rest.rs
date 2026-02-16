@@ -27,6 +27,18 @@ pub struct ArticleQuery {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct UserRegister {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UserRegisterResponse {
+    pub username: String,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct UserLogin {
     pub username: String,
     pub password: String,
@@ -37,15 +49,8 @@ pub struct LoginResponse {
     pub token: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct UserRegister {
-    pub username: String,
-    pub password: String,
-    pub confirm_password: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct UserRegisterResponse {
-    pub username: String,
-    pub user_id: Uuid,
+#[derive(Serialize)]
+pub struct Claim {
+    pub exp: usize,
+    pub sub: String,
 }
