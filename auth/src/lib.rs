@@ -9,46 +9,53 @@ use models::{
     db::User,
     rest::{Claim, LoginResponse, UserLogin, UserRegister},
 };
-use sqlx::{Pool, Postgres};
+use serde_valid::Validate;
+use sqlx::{Pool, Postgres, error::ErrorKind};
+
 
 pub async fn register_user(
     Extension(conn): Extension<Pool<Postgres>>,
     Json(inp): Json<UserRegister>,
 ) -> Response {
-    let x = sqlx::query_as::<_, User>("SELECT * from users where username = $1 and password_hash = encode(sha256($2::bytea), 'hex'); ")
+    let validation_result = inp.validate();
+    if validation_result.is_err() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(validation_result.unwrap_err())
+        ).into_response()
+    }
+
+    let res = sqlx::query(
+        r#"
+        INSERT INTO users (user_id, username, password_hash, created_at) 
+        values (
+            gen_random_uuid(), 
+            $1, 
+            encode(sha256($2::bytea), 'hex'), CURRENT_TIMESTAMP);
+    "#,
+    )
     .bind(&inp.username)
     .bind(&inp.password)
-    .fetch_one(&conn)
+    .execute(&conn)
     .await;
 
-    match x {
-        Ok(_) => (StatusCode::CONFLICT, "User Already Exists").into_response(),
-        Err(sqlx::Error::RowNotFound) => {
-            let res = sqlx::query(
-                r#"
-                INSERT INTO users (user_id, username, password_hash, created_at) 
-                values (
-                    gen_random_uuid(), 
-                    $1, 
-                    encode(sha256($2::bytea), 'hex'), CURRENT_TIMESTAMP);
-            "#,
-            )
-            .bind(&inp.username)
-            .bind(&inp.password)
-            .execute(&conn)
-            .await;
-
-            match res {
-                Ok(result) => {}
-                Err(err) => {
-                    
-                    format!("{:?}", err); // TODO
-                }
-            }
-
+    match res {
+        Ok(result) => {
             (StatusCode::CREATED).into_response()
         }
-        Err(err) => (StatusCode::UNAUTHORIZED, err.to_string()).into_response(),
+        Err(err) => {
+            match err.as_database_error().unwrap().kind() { // TODO
+                ErrorKind::UniqueViolation => {
+                    (StatusCode::ALREADY_REPORTED, "User Already Exists".to_string()).into_response()
+                },
+                err_kind => {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("{:?}: {:?}",err_kind, err)
+                    ).into_response()
+                }
+            }
+        }
     }
 }
 
