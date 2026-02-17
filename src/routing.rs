@@ -1,3 +1,4 @@
+use auth::{login_user, register_user};
 use axum::{
     Extension, Router,
     http::StatusCode,
@@ -30,5 +31,7 @@ pub async fn create_router() -> Router {
         .route("/articles", get(list_articles))
         .route("/articles/{id}", get(get_article))
         .route("/articles/{id}/read", post(article_mark_read))
+        .route("/user/register", post(register_user))
+        .route("/user/login", post(login_user))
         .layer(Extension(pool_conn.clone()))
 }

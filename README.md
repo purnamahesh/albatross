@@ -196,6 +196,116 @@ This project is a feature-rich RSS/Atom feed aggregator that provides a REST API
    - Protected routes (axum middleware)
    - User-specific feed subscriptions
 
+### JWT Authentication Deep Dive
+
+#### Database Schema
+
+```sql
+-- 003_create_users.sql
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### The Login Flow
+
+1. User sends username + password to `POST /login`
+2. Server looks up user, verifies password against hash (bcrypt)
+3. If valid, create a JWT containing:
+   - `sub` (subject): the user_id
+   - `exp` (expiration): timestamp when token dies (e.g., 24 hours from now)
+   - `iat` (issued at): current timestamp
+4. Sign the JWT with a secret key only your server knows
+5. Return the token to the client
+
+The client stores this token and sends it with every request.
+
+#### Auth Middleware Concept
+
+Every request to a protected endpoint passes through middleware **before** reaching the handler:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      AUTH MIDDLEWARE                        │
+├─────────────────────────────────────────────────────────────┤
+│  1. EXTRACT    → Look for Authorization: Bearer <token>     │
+│                  Missing? → 401 Unauthorized                │
+│                                                             │
+│  2. DECODE     → Parse the JWT (base64-encoded JSON)        │
+│                  Malformed? → 401 Unauthorized              │
+│                                                             │
+│  3. VERIFY     → Check signature with secret key            │
+│                  Invalid? → 401 Unauthorized                │
+│                                                             │
+│  4. EXPIRATION → Is `exp` in the past?                      │
+│                  Expired? → 401 Unauthorized                │
+│                                                             │
+│  5. ATTACH     → Extract user_id, attach to request context │
+│                  Handler now knows WHO is making request    │
+│                                                             │
+│  6. PASS       → Let request continue to handler            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Request Flow Visualization
+
+```
+Client                              Server
+   │                                   │
+   │  POST /login                      │
+   │  {username, password}             │
+   │ ──────────────────────────────────>
+   │                                   │ verify credentials
+   │                                   │ create JWT
+   │  200 OK                           │
+   │  {token: "eyJhbG..."}             │
+   │ <──────────────────────────────────
+   │                                   │
+   │  GET /api/feeds                   │
+   │  Authorization: Bearer eyJhbG...  │
+   │ ──────────────────────────────────>
+   │                                   │
+   │               ┌───────────────────┴───────────────────┐
+   │               │            MIDDLEWARE                 │
+   │               │  1. Extract token from header         │
+   │               │  2. Verify signature                  │
+   │               │  3. Check expiration                  │
+   │               │  4. Extract user_id                   │
+   │               │  5. Attach to request context         │
+   │               └───────────────────┬───────────────────┘
+   │                                   │
+   │                                   │ handler receives request
+   │                                   │ with user_id available
+   │  200 OK                           │
+   │  {user's feeds...}                │
+   │ <──────────────────────────────────
+```
+
+#### Protected vs Public Endpoints
+
+| Endpoint | Auth Required | Why |
+|----------|---------------|-----|
+| `POST /register` | No | Need to create account |
+| `POST /login` | No | Need to get token |
+| `GET /health` | No | Monitoring |
+| `GET /api/feeds` | **Yes** | User-specific data |
+| `POST /api/feeds` | **Yes** | User action |
+| `GET /api/articles` | **Yes** | User-specific data |
+| `PUT /api/articles/:id/read` | **Yes** | User action |
+
+#### Key Concepts
+
+**Why JWT works:** The token is *signed*, not encrypted. Anyone can read it, but only your server can create valid ones. If someone tampers with the payload, the signature won't match.
+
+**Stateless:** Server doesn't store sessions. The token itself contains everything needed to identify the user. This scales horizontally—any server instance can verify.
+
+**The secret key:** The one thing you must protect. If leaked, anyone can forge valid tokens. Store in environment variable, never commit.
+
+**Token payload:** Keep it minimal. User ID is enough. Don't put sensitive data (password, email)—tokens can be decoded by anyone.
+
 2. **Caching Layer** (redis)
    - Cache parsed feed data (15-minute TTL)
    - Cache frequently accessed articles
@@ -1435,11 +1545,11 @@ This is a learning project, but contributions are welcome! Areas for improvement
 
 ## Milestones & Checkpoints
 
-- [ ] **Phase 1**: Basic API with RSS fetching (2-3 weeks)
-- [ ] **Phase 2**: Database persistence and background updates (2 weeks)
-- [ ] **Phase 3**: Authentication, caching, rate limiting (3 weeks)
-- [ ] **Phase 4**: Production-ready with tests and docs (2-3 weeks)
-- [ ] **Phase 5**: Performance optimization and advanced features (ongoing)
+- [x] **Phase 1**: Basic API with RSS fetching
+- [x] **Phase 2**: Database persistence and background updates
+- [ ] **Phase 3**: Authentication, caching, rate limiting
+- [ ] **Phase 4**: Production-ready with tests and docs
+- [ ] **Phase 5**: Performance optimization and advanced features
 
 ---
 

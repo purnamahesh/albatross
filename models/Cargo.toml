@@ -8,3 +8,4 @@ serde = { version = "1.0.228", features = ["derive"] }
 uuid = { version = "1.19.0", features = ["v4", "serde"] }
 chrono = { version = "0.4.42", features = ["serde"]}
 sqlx = { version = "0.8.6", features = ["derive", "uuid"] }
+serde_valid = "2.0.1"

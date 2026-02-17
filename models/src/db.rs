@@ -22,3 +22,11 @@ pub struct Article {
     pub read: bool,
     pub published: DateTime<Utc>,
 }
+
+#[derive(Debug, Serialize, FromRow, Type)]
+pub struct User {
+    pub user_id: Uuid,
+    pub username: String,
+    pub password_hash: String,
+    pub created_at: DateTime<Utc>,
+}
